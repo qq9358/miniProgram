@@ -1,5 +1,5 @@
 <script>
-import "@/utils/dayjs.js";
+import "@/utils/dayjs.js"; 
 export default {
   data(){
     return {
