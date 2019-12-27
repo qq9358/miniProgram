@@ -1,9 +1,7 @@
 <template>
   <div class="refund">
     <div class="refund-tip margin-bottom-10">
-      <p>
-        经核实如未使用且符合退改规则，退款将于2-15个工作日退至您的支付账户。
-      </p>
+      <p>经核实如未使用且符合退改规则，退款将于2-15个工作日退至您的支付账户。</p>
     </div>
     <div class="refund-list margin-bottom-10">
       <h2 class="refund-money">
@@ -33,10 +31,7 @@
             </div>
           </div>
           <div class="refund-list-item">
-            <div
-              @click="showRefundDescription(detail.ticketTypeId)"
-              class="refund-rules"
-            >
+            <div @click="showRefundDescription(detail.ticketTypeId)" class="refund-rules">
               <span>退改规则</span>
               <van-icon name="arrow" />
             </div>
@@ -65,34 +60,26 @@
         </li>
       </ul>
     </div>
-    <bottom-button
-      text="申请取消"
-      type="price"
-      :loading="loading"
-      @click="refund"
-    ></bottom-button>
-    <refund-description
-      v-model="showDescription"
-      :ticket-type-id="currentTicketTypeId"
-    />
+    <van-popup :show="showDescription" position="bottom">
+      <refund-description :ticketTypeId="currentTicketTypeId" @click="closeDescription"/>
+    </van-popup>
+    <bottom-button text="申请取消" type="price" :loading="loading" @click="refund"></bottom-button>
+    <mptoast />
   </div>
 </template>
 
 <script>
 import dayjs from "dayjs";
 import BottomButton from "@/components/BottomButton.vue";
-import RefundDescription from "./RefundDescription.vue";
 import orderService from "@/services/orderService.js";
+import RefundDescription from "@/pages/orders/refund-description/RefundDescription.vue";
+import mptoast from "mptoast";
 
 export default {
   components: {
     BottomButton,
+    mptoast,
     RefundDescription
-  },
-  props: {
-    listNo: {
-      type: String
-    }
   },
   data() {
     return {
@@ -107,7 +94,8 @@ export default {
         "评价不好",
         "其他原因"
       ],
-      loading: false
+      loading: false,
+      listNo: ""
     };
   },
   computed: {
@@ -122,7 +110,8 @@ export default {
       return totalMoney;
     }
   },
-  async created() {
+  async onLoad(option) {
+    this.listNo = option.listNo;
     let order = await orderService.getOrderInfoForMobileAsync(this.listNo);
     order.details.forEach(d => (d.refundQuantity = d.surplusNum));
     this.order = order;
@@ -144,7 +133,7 @@ export default {
         this.loading = true;
 
         if (this.reasonIndex === -1) {
-          this.$toast("取消原因不能为空");
+          this.$mptoast("取消原因不能为空");
           return;
         }
 
@@ -166,12 +155,17 @@ export default {
           message: `退订申请已提交,我们最晚在北京时间${lastTime}前为您处理`,
           confirmButtonText: "知道了"
         });
-        this.$router.go(-1);
+        wx.navigateBack({
+          data: 1
+        });
       } catch (err) {
         return;
       } finally {
         this.loading = false;
       }
+    },
+    closeDescription(){
+      this.showDescription = false;
     }
   }
 };

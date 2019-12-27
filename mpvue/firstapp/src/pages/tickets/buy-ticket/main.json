@@ -9,6 +9,7 @@
         "van-submit-bar": "/static/vant/submit-bar/index",
         "van-popup": "/static/vant/popup/index",
         "van-nav-bar": "/static/vant/nav-bar/index",
+        "van-picker": "/static/vant/picker/index",
         "toast": "/static/vant/toast/index"
     }
 }

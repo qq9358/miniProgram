@@ -1,82 +1,52 @@
 <template>
-  <van-popup v-model="show" position="bottom">
-    <div class="description">
-      <div class="description-title">
-        <div>退改规则</div>
-        <div class="description-close-btn" @click="onClose">
-          <van-icon name="cuowu" />
-        </div>
+  <div class="description">
+    <div class="description-title">
+      <div>退改规则</div>
+      <div class="description-close-btn" @click="onClose">
+        <van-icon name="cuowu" />
       </div>
-      <div style="height: 100%; overflow-y: auto;">
-        <div class="description-content">
-          <div style="height:40px;">&nbsp;</div>
-          <div
-            v-if="ticketType.refundDescription"
-            class="description-content-item"
-          >
-            <div
-              class="description-content-item-text"
-              v-html="ticketType.refundDescription"
-            ></div>
-          </div>
+    </div>
+    <div style="height: 100%; overflow-y: auto;">
+      <div class="description-content">
+        <div style="height:40px;">&nbsp;</div>
+        <div v-if="ticketType.refundDescription" class="description-content-item">
+          <div class="description-content-item-text" v-html="ticketType.refundDescription"></div>
         </div>
       </div>
     </div>
-  </van-popup>
+  </div>
 </template>
 
 <script>
 import ticketTypeService from "@/services/ticketTypeService.js";
-import { mobileMixin } from "@/mixins/mobileMixin.js";
 
 export default {
   name: "ScenicNotice",
-  mixins: [mobileMixin],
   props: {
     ticketTypeId: {
       type: Number,
       default: 0
-    },
-    value: {
-      type: Boolean,
-      default: false
     }
   },
   data() {
     return {
-      show: this.value,
       ticketType: {},
       hasLoaded: false
     };
   },
-  watch: {
-    async value(val) {
-      this.show = val;
-
-      if (val && !this.hasLoaded) {
-        await this.loadDescription();
-      }
-    },
-    show(val) {
-      if (!val) {
-        this.$emit("input", val);
-      }
-    }
+  async onLoad() {
+    await this.loadDescription();
   },
   methods: {
-    onClose() {
-      this.show = false;
-    },
     async loadDescription() {
       const description = await ticketTypeService.getTicketTypeDescriptionAsync(
         this.ticketTypeId
       );
       this.ticketType = description;
       this.hasLoaded = true;
-
-      this.$nextTick(() => {
-        this.normalizeImage(".description-content-item");
-      });
+    },
+    onClose(){
+      this.$emit("click");
     }
   }
 };

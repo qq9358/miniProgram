@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import App from './App'
-import "./../static/style/index.scss"
+import "./assets/index.scss"
 import "./assets/iconfont.css"
 import store from "./store/index"
 import mpvueRouterPath from "mpvue-router-patch"

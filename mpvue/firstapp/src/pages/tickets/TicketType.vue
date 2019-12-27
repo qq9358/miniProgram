@@ -9,6 +9,15 @@
         </van-swipe>-->
         <Swiper :images="images" />
       </div>
+
+      <!-- <view class="parent_view" style="margin-top:rpx;">
+        <button
+          type="primary"
+          open-type="getUserInfo"
+          @getuserinfo="onGotUserInfo"
+          withCredentials="true"
+        >授权用户信息</button>
+      </view>-->
       <div v-if="scenic.noticeTitle" @click="showNotice = true" class="scenic-event">
         <div>
           <van-icon name="gonggao" />
@@ -59,11 +68,11 @@
           </div>
           <div>
             <div class="ticket-li-price">
-              <span class='ticket-li-price-span'>¥</span>
-              <span class='ticket-li-price-i'>{{ ticketType.price }}</span>
+              <span class="ticket-li-price-span">¥</span>
+              <span class="ticket-li-price-i">{{ ticketType.price }}</span>
             </div>
             <div class="ticket-li-btn">
-              <button class='button-main' @click="onBuy(ticketType)">立即预订</button>
+              <button class="button-main" @click="onBuy(ticketType)">立即预订</button>
             </div>
           </div>
         </div>
@@ -151,15 +160,14 @@
                 <h3>其他说明</h3>
                 <div class="description-content-item-text" v-html="description.otherDescription"></div>
               </div>
-              <div v-if="showBuy" style="height:49px;">&nbsp;</div>
+              <div style="height:49px;">&nbsp;</div>
             </div>
           </div>
           <van-submit-bar
-            v-if="showBuy"
             :price="ticketTypePrice"
             label=" "
             button-text="立即预订"
-            @submit="onBuy"
+            @submit="onSelectBuy"
           />
         </div>
       </van-popup>
@@ -218,13 +226,20 @@ export default {
     },
     ...mapState(["groundId"])
   },
+  watch: {
+    showDescription: function(val) {
+      if (val) {
+        wx.hideTabBar({});
+      } else {
+        wx.showTabBar({});
+      }
+    }
+  },
   async onLoad() {
     let querySelect = wx.createSelectorQuery().in(this);
     querySelect.select("#ticket-div").boundingClientRect();
-    querySelect.exec(function(res) {
-      console.log(res);
-    });
-    const loginTask = await memberService.loginFromMiniAsync();
+    querySelect.exec(function(res) {});
+    const loginTask = await memberService.loginFromWeChatAsync({ code: "1" });
     const groundId = this.groundId;
     const ticketTypes = await ticketTypeService.getTicketTypesForWeiXinSaleAsync(
       {
@@ -241,7 +256,6 @@ export default {
     this.ticketTypes = ticketTypes;
 
     // });
-    // console.log(getTicketTypeTask);
     const scenic = await scenicService.getScenicAsync();
     // .then(scenic => {
     if (scenic.photoList && scenic.photoList.length > 0) {
@@ -297,6 +311,13 @@ export default {
         url: `/pages/tickets/buy-ticket/main?ticketTypeId=${ticketType.id}`
       });
     },
+    onSelectBuy() {
+      wx.navigateTo({
+        url: `/pages/tickets/buy-ticket/main?ticketTypeId=${
+          this.selectedTicketType.id
+        }`
+      });
+    },
     getTravelDateText(ticketType) {
       const startTravelDate = dayjs(ticketType.startTravelDate);
       let travelDateText = "";
@@ -322,6 +343,9 @@ export default {
         return "#ff2f39";
       }
       return ticketType.refundLimited ? "#ffae13" : "#099fde";
+    },
+    onGotUserInfo: async function(e) {
+      await memberService.loginFromMiniAsync(e.mp.detail.userInfo);
     },
     ...mapMutations(["setGroundId"])
   }

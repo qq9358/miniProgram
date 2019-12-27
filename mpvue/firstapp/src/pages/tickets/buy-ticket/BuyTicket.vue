@@ -59,28 +59,18 @@
         <span class="booking-mod-hd-title">场次信息</span>
       </div>
       <div class="booking-mod-bd">
-        <van-cell-group>
-          <!-- <picker-field
-            v-for="groundChangCi in ticketType.groundChangCis"
-            :key="groundChangCi.groundId"
-            :columns="groundChangCi.changCis"
-            :label="groundChangCi.groundName"
-            v-model="groundChangCi.changCiId"
-            placeholder="请选择场次"
-            class="changCi"
-          /> -->
-          <div v-for="groundChangCi in ticketType.groundChangCis" :key="groundChangCi.groundId">
-            <div>{{groundChangCi.groundName}}</div>
-            <picker
-              :value="groundChangCi.changCiId"
-              :range="groundChangCi.changCis"
-              range-key="displayText"
-              @change="bindPickerChange($event,groundChangCi)"
-            >
-              <div class="picker">当前选择：{{groundChangCi.changCiId}}</div>
-            </picker>
-          </div>
-        </van-cell-group>
+        <div v-for="groundChangCi in ticketType.groundChangCis" :key="groundChangCi.groundId">
+          <div>{{groundChangCi.groundName}}</div>
+          <picker
+            :value="groundChangCi.changCiId"
+            :range="groundChangCi.changCis"
+            range-key="displayText"
+            @change="bindPickerChange($event,groundChangCi)"
+          >
+            <div v-if="groundChangCi.changCiId" class="picker">{{groundChangCi.changCiId}}</div>
+            <div v-else >请选择场次</div>
+          </picker>
+        </div>
       </div>
     </div>
 
@@ -502,7 +492,6 @@ export default {
       this.showTourist = false;
     },
     async onSubmit() {
-      console.log(this.ticketType);
       if (this.ticketType.groundChangCis.length > 0) {
         for (const groundChangCi of this.ticketType.groundChangCis) {
           if (!groundChangCi.changCiId) {
@@ -605,7 +594,6 @@ export default {
         );
 
         this.saving = true;
-        console.log(this.input);
         const result = await orderService.createWeiXinOrderAsync(this.input);
         this.submited = true;
         if (result.shouldPay) {
@@ -648,8 +636,14 @@ export default {
     editMobileChange(val) {
       this.editTourist.certNo = val.mp.detail;
     },
-    bindPickerChange({mp},groundChangCi) {
+    bindPickerChange({ mp }, groundChangCi) {
       groundChangCi.changCiId = groundChangCi.changCis[mp.detail.value].value;
+    },
+    changCiClick(groundChangCi) {
+      groundChangCi.showPicker = true;
+    },
+    changCiCancel(groundChangCi) {
+      groundChangCi.showPicker = false;
     }
   }
 };
@@ -900,6 +894,11 @@ export default {
         }
       }
     }
+  }
+
+  .div-picker {
+    display: flex;
+    justify-content: space-between;
   }
 }
 

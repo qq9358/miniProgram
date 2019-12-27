@@ -97,7 +97,7 @@
                     @click="onBarcodeClick(ticket)"
                     class="order-detail-code-item"
                     :class="{
-                      pb16: ticket.isUsable && !isBarcodeCollapse(ticket)
+                      pb16: ticket.isUsable && ! ticket.ticketCode != currentBarcode
                     }"
                   >
                     <div class="order-detail-code-item-angle">
@@ -117,12 +117,15 @@
                       <span>{{ ticket.ticketCode }}</span>
                     </div>
                     <div v-if="ticket.isUsable" class="order-detail-code-item-img">
-                      <div v-if="isBarcodeCollapse(ticket)" class="order-detail-code-item-img-btn">
+                      <div
+                        v-if="currentBarcode != ticket.ticketCode"
+                        class="order-detail-code-item-img-btn"
+                      >
                         <van-icon name="qr" />
                         <span>查看二维码</span>
                       </div>
                       <img
-                        v-if="!isBarcodeCollapse(ticket)"
+                        v-if="currentBarcode == ticket.ticketCode"
                         :src="ticket.qrcode"
                         class="order-detail-code-item-img-src"
                       />
@@ -304,8 +307,12 @@ export default {
         detail => detail.groundChangCis && detail.groundChangCis.length > 0
       );
     },
-    showTravelDate(detail) {
-      return detail.eTime && detail.eTime != orderInfo.travelDate;
+    isBarcodeCollapse(ticket) {
+      let showQrCode = false;
+      if (ticket.ticketCode == this.currentBarcode) {
+        showQrCode = true;
+      }
+      return showQrCode;
     }
   },
   async onLoad(option) {
@@ -390,25 +397,19 @@ export default {
     onBarcodeClick(ticket) {
       this.currentBarcode = ticket.ticketCode;
     },
-    isBarcodeCollapse(ticket) {
-      return this.currentBarcode !== ticket.ticketCode;
-    },
     pay() {
       wx.navigateTo({
         url: `/pages/payment/wx-js-pay/main?listNo=${this.listNo}`
-      })
+      });
     },
     async refund() {
-      if (this.allowCancel) {
-        await this.cancelOrder();
-      } else {
-        this.$router.push({
-          name: "refundticket",
-          params: {
-            listNo: this.listNo
-          }
-        });
-      }
+      // if (this.allowCancel) {
+      //   await this.cancelOrder();
+      // } else {
+      wx.navigateTo({
+        url: `/pages/orders/refund-ticket/main?listNo=${this.listNo}`
+      });
+      // }
     },
     async cancelOrder() {
       try {
@@ -434,19 +435,20 @@ export default {
       }
     },
     buyAgain() {
-      this.$router.push("/");
+      wx.switchTab({
+        url: "/pages/tickets/main"
+      });
     },
     refundDetail() {
-      this.$router.push({
-        name: "refunddetail",
-        params: { listNo: this.listNo }
+      wx.navigateTo({
+        url: `/pages/orders/refund-detail/main?listNo=${this.listNo}`
       });
     },
     enrollFace() {
-      this.$router.push({
-        name: "EnrollFace",
-        params: { listNo: this.listNo }
-      });
+      // this.$router.push({
+      //   name: "EnrollFace",
+      //   params: { listNo: this.listNo }
+      // });
     }
   }
 };

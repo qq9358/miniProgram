@@ -39,13 +39,13 @@
           active-color="#2a99f1"
         >
           <van-step
-            v-for="(statusDetail, index) in refundApply.statusDetails"
-            :key="index"
+            v-for="(statusDetail, statusIndex) in refundApply.statusDetails"
+            :key="statusIndex"
           >
             <h3 class="refund-step-name">{{ statusDetail.title }}</h3>
             <p
-              v-for="(detail, index) in statusDetail.details"
-              :key="index"
+              v-for="(detail, detailIndex) in statusDetail.details"
+              :key="detailIndex"
               class="refund-step-label"
             >
               {{ detail }}
@@ -62,23 +62,20 @@ import orderService from "@/services/orderService.js";
 
 export default {
   name: "RefundDetail",
-  props: {
-    listNo: {
-      type: String
-    }
-  },
   data() {
     return {
       topText: "",
-      refundApplys: []
+      refundApplys: [],
+      listNo: ''
     };
   },
-  async created() {
+  async onLoad(option) {
+    this.listNo = option.listNo;
     try {
-      this.$toast.loading({
-        duration: 0,
-        message: "加载中..."
-      });
+      // this.$toast.loading({
+      //   duration: 0,
+      //   message: "加载中..."
+      // });
 
       const refundApplys = await orderService.getRefundApplysWithStatusDetailAsync(
         this.listNo
@@ -94,7 +91,7 @@ export default {
     } catch (err) {
       return;
     } finally {
-      this.$toast.clear();
+      // this.$toast.clear();
     }
   },
   methods: {

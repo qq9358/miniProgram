@@ -107,10 +107,6 @@ export default {
     },
     onPanelClick(listNo) {
       this.currentListNo = listNo;
-      // this.$router.push({
-      //   name: "orderdetail",
-      //   params: { listNo: listNo }
-      // });
       wx.navigateTo({
         url: `/pages/orders/order-detail/main?listNo=${listNo}`
       })

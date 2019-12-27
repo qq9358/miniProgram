@@ -90,9 +90,6 @@ export default {
       return memberService.getMember();
     }
   },
-  created(){
-    console.log(this.member);
-  },
   methods:{
     myTicketClick(){
       // wx.navigateTo({

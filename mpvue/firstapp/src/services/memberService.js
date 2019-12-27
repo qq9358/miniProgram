@@ -32,8 +32,6 @@ export default {
       }
     })
     // 获取用户的当前设置。本项目里判断用户是否已授权登录
-
-
   },
   async bindStaffAsync(input) {
     const response = await ajax.post("/member/BindStaffAsync", input);
