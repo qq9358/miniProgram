@@ -240,13 +240,13 @@
             @click="refund"
           >{{ refundText }}</van-button>
           <van-button v-else color="#099fde" size="small" plain @click="buyAgain">再次预订</van-button>
-          <van-button
+          <!-- <van-button
             v-if="orderInfo.shouldValidateFace"
             color="#099fde"
             size="small"
             plain
             @click="enrollFace"
-          >登记人脸</van-button>
+          >登记人脸</van-button> -->
         </section>
         <mptoast />
       </div>

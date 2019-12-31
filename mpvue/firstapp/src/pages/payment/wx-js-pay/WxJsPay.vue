@@ -148,9 +148,8 @@ export default {
             if (result.paySuccess) {
               this.clear();
               this.shouldConfirm = false;
-              this.$router.replace({
-                name: "orderdetail",
-                params: { listNo: this.listNo }
+              wx.navigateTo({
+                url: `/pages/orders/order-detail/main?listNo=${this.listNo}`
               });
             }
           });

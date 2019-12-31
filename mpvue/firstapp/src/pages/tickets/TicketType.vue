@@ -10,7 +10,7 @@
         <Swiper :images="images" />
       </div>
 
-      <div class="parent_view" style="margin-top:rpx;">
+      <div v-if="showGetUser" class="parent_view" style="margin-top:rpx;">
         <button
           type="primary"
           open-type="getUserInfo"
@@ -217,7 +217,8 @@ export default {
         usageDescription: "",
         refundDescription: "",
         otherDescription: ""
-      }
+      },
+      showGetUser: true
     };
   },
   computed: {
@@ -236,64 +237,70 @@ export default {
     }
   },
   async onLoad() {
-    let querySelect = wx.createSelectorQuery().in(this);
-    querySelect.select("#ticket-div").boundingClientRect();
-    querySelect.exec(function(res) {});
-    const loginTask = await memberService.loginFromMiniAsync();
-    const groundId = this.groundId;
-    const ticketTypes = await ticketTypeService.getTicketTypesForWeiXinSaleAsync(
-      {
-        publicSaleFlag: this.publicSaleFlag,
-        groundId: groundId
-      }
-    );
-    // .then(ticketTypes => {
-    for (const ticketType of ticketTypes) {
-      ticketType.travelDateText = this.getTravelDateText(ticketType);
-      ticketType.refundText = this.getRefundText(ticketType);
-    }
-
-    this.ticketTypes = ticketTypes;
-
-    // });
-    const scenic = await scenicService.getScenicAsync();
-    // .then(scenic => {
-    if (scenic.photoList && scenic.photoList.length > 0) {
-      this.images = scenic.photoList.map(p => p.url);
-      this.shareImgUrl = this.images[0];
-    }
-
-    if (scenic.openTime && scenic.closeTime) {
-      const today = dayjs().toDateString();
-      const openTime = dayjs(`${today} ${scenic.openTime}:00`);
-      const closeTime = dayjs(`${today} ${scenic.closeTime}:00`);
-      const now = dayjs();
-      if (now.isBefore(openTime)) {
-        scenic.openText = `未开园 ${scenic.openTime}开园`;
-      } else if (now.isBetween(openTime, closeTime)) {
-        scenic.openText = `开放中 ${scenic.closeTime}闭园`;
-      } else {
-        scenic.openText = `已闭园 明日${scenic.openTime}开园`;
-      }
-    }
-
-    this.scenic = scenic;
-    // })
-    // .then(() => {
-    let shareUrl = `/tickettype/${this.publicSaleFlag}`;
-    if (groundId) {
-      shareUrl += `?groundId=${groundId}`;
-    }
-    settingService.configWxJsApi().then(() => {
-      settingService.configWxShareUrl(shareUrl, this.shareImgUrl);
-    });
-    // });
     try {
-      // await Promise.all([getTicketTypeTask, getScenicTask]);
+      const loginTask = await memberService.loginFromMiniAsync();
+      const member = memberService.getMember();
+      console.log(member);
+      // this.showGetUser = false;
+      await this.loadData();
     } finally {
+
     }
   },
   methods: {
+    async loadData() {
+      let querySelect = wx.createSelectorQuery().in(this);
+      querySelect.select("#ticket-div").boundingClientRect();
+      querySelect.exec(function(res) {});
+
+      const groundId = this.groundId;
+      const ticketTypes = await ticketTypeService.getTicketTypesForWeiXinSaleAsync(
+        {
+          publicSaleFlag: this.publicSaleFlag,
+          groundId: groundId
+        }
+      );
+      // .then(ticketTypes => {
+      for (const ticketType of ticketTypes) {
+        ticketType.travelDateText = this.getTravelDateText(ticketType);
+        ticketType.refundText = this.getRefundText(ticketType);
+      }
+
+      this.ticketTypes = ticketTypes;
+
+      // });
+      const scenic = await scenicService.getScenicAsync();
+      // .then(scenic => {
+      if (scenic.photoList && scenic.photoList.length > 0) {
+        this.images = scenic.photoList.map(p => p.url);
+        this.shareImgUrl = this.images[0];
+      }
+
+      if (scenic.openTime && scenic.closeTime) {
+        const today = dayjs().toDateString();
+        const openTime = dayjs(`${today} ${scenic.openTime}:00`);
+        const closeTime = dayjs(`${today} ${scenic.closeTime}:00`);
+        const now = dayjs();
+        if (now.isBefore(openTime)) {
+          scenic.openText = `未开园 ${scenic.openTime}开园`;
+        } else if (now.isBetween(openTime, closeTime)) {
+          scenic.openText = `开放中 ${scenic.closeTime}闭园`;
+        } else {
+          scenic.openText = `已闭园 明日${scenic.openTime}开园`;
+        }
+      }
+
+      this.scenic = scenic;
+      // })
+      // .then(() => {
+      let shareUrl = `/tickettype/${this.publicSaleFlag}`;
+      if (groundId) {
+        shareUrl += `?groundId=${groundId}`;
+      }
+      settingService.configWxJsApi().then(() => {
+        settingService.configWxShareUrl(shareUrl, this.shareImgUrl);
+      });
+    },
     async onShowDescription(ticketType) {
       this.description = await ticketTypeService.getTicketTypeDescriptionAsync(
         ticketType.id
@@ -346,6 +353,7 @@ export default {
     },
     onGotUserInfo: async function(e) {
       await memberService.loginFromMiniAsync(e.mp.detail.userInfo);
+      await this.loadData();
     },
     ...mapMutations(["setGroundId"])
   }
