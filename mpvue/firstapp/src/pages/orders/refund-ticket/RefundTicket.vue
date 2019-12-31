@@ -1,5 +1,6 @@
 <template>
   <div class="refund">
+    <van-dialog id="van-dialog" />
     <div class="refund-tip margin-bottom-10">
       <p>经核实如未使用且符合退改规则，退款将于2-15个工作日退至您的支付账户。</p>
     </div>
@@ -26,7 +27,7 @@
                 v-model="detail.refundQuantity"
                 :max="detail.surplusNum"
                 integer
-                @change="onQuantityChange(detail)"
+                @change="onQuantityChange($event,detail)"
               />
             </div>
           </div>
@@ -47,23 +48,24 @@
       </h3>
       <ul>
         <li style="padding:0;">
-          <van-radio-group v-model="reasonIndex">
+          <radio-group v-model="reasonIndex" @change="reasonChange">
             <div
               v-for="(reason, index) in reasons"
               :key="index"
               class="refund-list-item refund-reason"
               @click="reasonIndex = index"
             >
-              <van-radio :name="index">{{ reason }}</van-radio>
+              <radio :name="index">{{ reason }}</radio>
             </div>
-          </van-radio-group>
+          </radio-group>
         </li>
       </ul>
     </div>
     <van-popup :show="showDescription" position="bottom">
-      <refund-description :ticketTypeId="currentTicketTypeId" @click="closeDescription"/>
+      <refund-description :ticketTypeId="currentTicketTypeId" @click="closeDescription" />
     </van-popup>
-    <bottom-button text="申请取消" type="price" :loading="loading" @click="refund"></bottom-button>
+    <!-- <bottom-button text="申请取消" type="price" :loading="loading" @click="refund"></bottom-button> -->
+    <button :loading="loading" @click="refund" class="button-bottom">申请取消</button>
     <mptoast />
   </div>
 </template>
@@ -73,6 +75,7 @@ import dayjs from "dayjs";
 import BottomButton from "@/components/BottomButton.vue";
 import orderService from "@/services/orderService.js";
 import RefundDescription from "@/pages/orders/refund-description/RefundDescription.vue";
+import Dialog from "@/../static/vant/dialog/dialog";
 import mptoast from "mptoast";
 
 export default {
@@ -121,7 +124,8 @@ export default {
       this.currentTicketTypeId = ticketTypeId;
       this.showDescription = true;
     },
-    onQuantityChange(detail) {
+    onQuantityChange({ mp }, detail) {
+      detail.refundQuantity = mp.detail;
       if (detail.refundQuantity > detail.surplusNum) {
         this.$nextTick(() => {
           detail.refundQuantity = detail.surplusNum;
@@ -151,21 +155,27 @@ export default {
         const lastTime = dayjs()
           .addDays(2)
           .format("YYYY-MM-DD 23:00");
-        await this.$dialog.alert({
+        Dialog.alert({
           message: `退订申请已提交,我们最晚在北京时间${lastTime}前为您处理`,
           confirmButtonText: "知道了"
-        });
-        wx.navigateBack({
-          data: 1
-        });
+        })
+          .then(() => {
+            wx.navigateBack({
+              data: 1
+            });
+          })
+          .catch(() => {});
       } catch (err) {
         return;
       } finally {
         this.loading = false;
       }
     },
-    closeDescription(){
+    closeDescription() {
       this.showDescription = false;
+    },
+    reasonChange({ mp }) {
+      this.reasonIndex = mp.detail;
     }
   }
 };
@@ -283,6 +293,21 @@ export default {
     .van-radio__input {
       margin-top: -5px;
     }
+  }
+
+  .button-bottom {
+    width: 100%;
+    height: 100%;
+    border-radius: 0;
+    font-size: 16px;
+    color: #fff;
+    background-color: #ff7d13;
+    border: 1px solid #ff7d13;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 50px;
+    margin-top: 25px;
   }
 }
 </style>

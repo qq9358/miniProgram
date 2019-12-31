@@ -1,6 +1,6 @@
 <template>
   <div>
-    <van-tabs v-model="tabIndex" @click="tabClick" class="order-tabs">
+    <van-tabs v-model="tabIndex" @change="tabClick" class="order-tabs">
       <van-tab title="全部"></van-tab>
       <van-tab title="待付款"></van-tab>
       <van-tab title="待使用"></van-tab>
@@ -9,7 +9,7 @@
       <!-- <no-data
         v-if="dataLoaded && orders.length === 0"
         :content-height="contentHeight"
-      ></no-data> -->
+      ></no-data>-->
       <div v-if="dataLoaded && orders.length === 0" class="no-data">
         <i class="no-data-icon van-icon van-icon-wushuju" />
         <div>暂无数据</div>
@@ -29,9 +29,11 @@
         >
           <van-row class="panel-title">
             <van-col span="16">{{ order.listNo }}</van-col>
-            <van-col span="8" class="panel-title-status">{{
+            <van-col span="8" class="panel-title-status">
+              {{
               order.orderStatusName
-            }}</van-col>
+              }}
+            </van-col>
           </van-row>
           <van-row class="panel-item">
             <van-col>游玩日期：{{ order.travelDate }}</van-col>
@@ -94,12 +96,12 @@ export default {
       }
     });
   },
-  onLoad(){
+  onLoad() {
     this.getOrders();
   },
   methods: {
-    async tabClick(index) {
-      this.tabIndex = index;
+    async tabClick({ mp }) {
+      this.tabIndex = mp.detail.index;
       await this.loadData();
     },
     async listLoad() {
@@ -109,7 +111,7 @@ export default {
       this.currentListNo = listNo;
       wx.navigateTo({
         url: `/pages/orders/order-detail/main?listNo=${listNo}`
-      })
+      });
     },
     async loadData() {
       this.queryInput.skipCount = 0;
@@ -188,7 +190,7 @@ export default {
   }
 }
 
-.no-data{
+.no-data {
   margin-top: 300px;
 }
 </style>

@@ -10,14 +10,14 @@
         <Swiper :images="images" />
       </div>
 
-      <!-- <view class="parent_view" style="margin-top:rpx;">
+      <div class="parent_view" style="margin-top:rpx;">
         <button
           type="primary"
           open-type="getUserInfo"
           @getuserinfo="onGotUserInfo"
           withCredentials="true"
         >授权用户信息</button>
-      </view>-->
+      </div>
       <div v-if="scenic.noticeTitle" @click="showNotice = true" class="scenic-event">
         <div>
           <van-icon name="gonggao" />
@@ -239,7 +239,7 @@ export default {
     let querySelect = wx.createSelectorQuery().in(this);
     querySelect.select("#ticket-div").boundingClientRect();
     querySelect.exec(function(res) {});
-    const loginTask = await memberService.loginFromWeChatAsync({ code: "1" });
+    const loginTask = await memberService.loginFromMiniAsync();
     const groundId = this.groundId;
     const ticketTypes = await ticketTypeService.getTicketTypesForWeiXinSaleAsync(
       {

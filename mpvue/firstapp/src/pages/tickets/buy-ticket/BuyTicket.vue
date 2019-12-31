@@ -287,7 +287,8 @@ export default {
         ],
         travelDate: "",
         contactName: "",
-        contactMobile: ""
+        contactMobile: "",
+        ifMini: true
       },
       quantity: 1,
       tourists: [],

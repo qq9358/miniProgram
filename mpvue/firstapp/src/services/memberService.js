@@ -6,26 +6,38 @@ export default {
     const response = await ajax.post("/member/LoginFromWeChatAsync", input);
     this.setMember(response);
   },
-  async loginFromMiniAsync() {
+  async loginFromMiniAsync(userInfo) {
     let self = this;
     await wx.login({
       async success(res) {
         if (res.code) {
           // 封装的缓存方法
-          await wx.getUserInfo({
-            async success(rest) {
-
-              let params = {
-                code: res.code,
-                userInfo: rest.userInfo
-              }
-              const response = await ajax.post('/member/LoginFromMiniAsync', params)
-                .then((res) => {
-
-                  self.setMember(res);
-                });
+          if (userInfo) {
+            let params = {
+              code: res.code,
+              userInfo: userInfo
             }
-          })
+            const response = await ajax.post('/member/LoginFromMiniAsync', params)
+              .then((res) => {
+
+                self.setMember(res);
+              });
+          } else {
+            await wx.getUserInfo({
+              async success(rest) {
+
+                let params = {
+                  code: res.code,
+                  userInfo: rest.userInfo
+                }
+                const response = await ajax.post('/member/LoginFromMiniAsync', params)
+                  .then((res) => {
+
+                    self.setMember(res);
+                  });
+              }
+            })
+          }
         } else {
           console.log('登录失败！' + res.errMsg)
         }

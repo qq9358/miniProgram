@@ -6,7 +6,7 @@
         <span>{{ countdownText }}</span>
       </div>
       <div class="in-order-fee">
-        <span class='in-order-fee-dfn'>¥</span>
+        <span class="in-order-fee-dfn">¥</span>
         <span>{{ totalMoney }}</span>
       </div>
       <div class="in-order-title">{{ product }}</div>
@@ -18,10 +18,14 @@
       </div>
     </div>
     <div class="in-button">
-      <button class='button-operate' size="large" :loading="saving" @click="pay"
-        >确认支付</button
-      >
+      <button class="button-operate" size="large" :loading="saving" @click="pay">确认支付</button>
     </div>
+    <van-popup :show="showQuery" :close-on-click-overlay="false">
+      <div class="popup-query">
+        <van-loading />
+        <div class="popup-text">查询支付结果中...</div>
+      </div>
+    </van-popup>
   </div>
 </template>
 
@@ -40,7 +44,8 @@ export default {
       queryTimer: -1,
       saving: false,
       shouldConfirm: true,
-      listNo: ''
+      listNo: "",
+      showQuery: false
     };
   },
   computed: {
@@ -121,13 +126,23 @@ export default {
         this.saving = true;
 
         const payArgs = await paymentService.jsApiPayAsync(this.listNo);
-        await weiXinJsSdkHelper.jsApiPay(payArgs);
-        this.$toast.loading({
-          duration: 0,
-          message: "查询支付结果...",
-          className: "van-toast-big"
-        });
+        let payObj = JSON.parse(payArgs);
+        await wx.requestPayment({
+          timeStamp: payObj.timeStamp,
+          nonceStr: payObj.nonceStr,
+          package: payObj.package,
+          signType: payObj.signType,
+          paySign: payObj.paySign,
+          success: function(res) {},
+          fail: function(res) {
+            if (res.errMsg == "requestPayment:fail cancel") return;
 
+            commonService.logError(res.errMsg);
+          },
+          complete: function(res) {
+            console.log(res);
+          }
+        });
         this.queryTimer = setInterval(() => {
           paymentService.getNetPayOrderAsync(this.listNo).then(result => {
             if (result.paySuccess) {
@@ -140,6 +155,7 @@ export default {
             }
           });
         }, 3000);
+        this.showQuery = true;
       } catch (err) {
         if (err.err_msg == "get_brand_wcpay_request:cancel") return;
 
@@ -151,7 +167,7 @@ export default {
     clear() {
       clearInterval(this.timer);
       clearInterval(this.queryTimer);
-      this.$toast.clear();
+      this.showQuery = false;
     }
   }
 };
@@ -175,7 +191,7 @@ export default {
     font-size: 30px;
     letter-spacing: -0.44px;
 
-   &-dfn{
+    &-dfn {
       font-size: 20px;
       margin-right: 8px;
     }
@@ -223,5 +239,15 @@ export default {
   button {
     border-radius: 5px;
   }
+}
+
+.popup-query {
+  background: #000000;
+  color: #ffffff;
+  padding: 30px 18px;
+  text-align: center;
+}
+.popup-text {
+  margin-top: 13px;
 }
 </style>

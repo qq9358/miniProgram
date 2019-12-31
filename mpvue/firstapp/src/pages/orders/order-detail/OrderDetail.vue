@@ -317,7 +317,8 @@ export default {
   },
   async onLoad(option) {
     this.listNo = option.listNo;
-
+  },
+  async onShow() {
     await this.loadData();
   },
   beforeRouteLeave(to, from, next) {
@@ -403,20 +404,17 @@ export default {
       });
     },
     async refund() {
-      // if (this.allowCancel) {
-      //   await this.cancelOrder();
-      // } else {
-      wx.navigateTo({
-        url: `/pages/orders/refund-ticket/main?listNo=${this.listNo}`
-      });
-      // }
+      if (this.allowCancel) {
+        await this.cancelOrder();
+      } else {
+        wx.navigateTo({
+          url: `/pages/orders/refund-ticket/main?listNo=${this.listNo}`
+        });
+      }
     },
     async cancelOrder() {
       try {
         this.saving = true;
-        // await this.$dialog.confirm({
-        //   title: "确定取消订单？"
-        // });
         Dialog.confirm({
           title: "确定取消订单?"
         })

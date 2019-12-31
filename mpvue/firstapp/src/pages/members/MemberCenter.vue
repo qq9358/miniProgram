@@ -21,52 +21,6 @@
         @click="myTicketClick"
         class="icon-vertical-center"
       />
-      <van-cell
-        v-permission="[permissions.TMSWeChat_CheckTicket]"
-        title="门票核销"
-        is-link
-        icon="yanpiao"
-        to="/CheckTicket"
-        class="icon-vertical-center"
-      />
-      <van-cell
-        v-permission="[permissions.TMSWeChat_QueryTicket]"
-        title="门票查询"
-        is-link
-        icon="search"
-        to="/QueryTicket"
-      />
-      <van-cell
-        v-permission="[permissions.TMSWeChat_Distribution]"
-        title="分销平台"
-        is-link
-        icon="apps-o"
-        to="/Distribution"
-      />
-      <van-cell
-        v-permission="[permissions.TMSWeChat_TicketSaleStat]"
-        title="售票统计"
-        is-link
-        icon="tongji"
-        to="/TicketSaleStat"
-        class="icon-vertical-center"
-      />
-      <van-cell
-        v-permission="[permissions.TMSWeChat_TradeStat]"
-        title="收入汇总"
-        is-link
-        icon="tongji"
-        to="/TradeStat"
-        class="icon-vertical-center"
-      />
-      <van-cell
-        v-permission="[permissions.TMSWeChat_TicketCheckStat]"
-        title="检票统计"
-        is-link
-        icon="tongji"
-        to="/TicketCheckStat"
-        class="icon-vertical-center"
-      />
     </van-cell-group>
   </div>
 </template>

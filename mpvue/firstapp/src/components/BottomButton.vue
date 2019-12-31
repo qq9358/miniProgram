@@ -3,7 +3,7 @@
     <div style="height:50px"></div>
     <div class="bottom-button">
       <div class="bottom-button-bar">
-        <van-button :type="type" :loading="loading" @click="onClick">{{
+        <van-button :type="type" :loading="loading" @click="onClick" class="button-bottom">{{
           text
         }}</van-button>
       </div>
@@ -51,7 +51,7 @@ export default {
   }
 
   .van-button {
-    width: 100%;
+    width: 100vw;
     height: 100%;
     border-radius: 0;
     font-size: 16px;
@@ -59,6 +59,9 @@ export default {
     &--disabled {
       border: none;
     }
+  }
+  button {
+    width: 100vw;
   }
 }
 </style>
