@@ -54,7 +54,7 @@ export default {
       return this.$store.state.clientHeight - 46;
     }
   },
-  async onLoad() {
+  async onShow() {
     await this.getTickets();
   },
   methods: {

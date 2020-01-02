@@ -1,6 +1,7 @@
 <template>
   <div ref="grbody" class="booking">
     <mptoast />
+    <van-dialog id="van-dialog" />
     <div class="booking-mod">
       <div class="booking-mod-hd">
         <span class="booking-mod-hd-title">使用日期</span>
@@ -68,7 +69,7 @@
             @change="bindPickerChange($event,groundChangCi)"
           >
             <div v-if="groundChangCi.changCiId" class="picker">{{groundChangCi.changCiId}}</div>
-            <div v-else >请选择场次</div>
+            <div v-else>请选择场次</div>
           </picker>
         </div>
       </div>
@@ -257,6 +258,7 @@ import ticketTypeService from "@/services/ticketTypeService.js";
 import orderService from "@/services/orderService.js";
 import validate from "@/utils/validator.js";
 import mptoast from "mptoast";
+import Dialog from "@/../static/vant/dialog/dialog";
 
 class Tourist {
   constructor() {
@@ -426,7 +428,7 @@ export default {
     } finally {
     }
   },
-  beforeRouteLeave(to, from, next) {
+  beforeRouterLeave(to, from, next) {
     if (this.showTourist) {
       this.showTourist = false;
       next(false);
@@ -439,15 +441,13 @@ export default {
       return;
     }
 
-    this.$dialog
-      .confirm({
-        title: "确认离开订单填写页？",
-        showCancelButton: true,
-        confirmButtonText: "离开",
-        cancelButtonText: "取消"
-      })
+    this.Dialog.confirm({
+      title: "确认离开订单填写页？",
+      showCancelButton: true,
+      confirmButtonText: "离开",
+      cancelButtonText: "取消"
+    })
       .then(() => {
-        this.$mptoast.clear();
         next();
       })
       .catch(() => {

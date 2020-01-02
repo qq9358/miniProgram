@@ -2,11 +2,6 @@
   <div>
     <div class="scenic">
       <div class="scenic-screen">
-        <!-- <van-swipe :autoplay="3000" :height="swipeHeight">
-          <van-swipe-item v-for="(image, index) in images" :key="index">
-            <img :src="image" />
-          </van-swipe-item>
-        </van-swipe>-->
         <Swiper :images="images" />
       </div>
 
@@ -72,7 +67,13 @@
               <span class="ticket-li-price-i">{{ ticketType.price }}</span>
             </div>
             <div class="ticket-li-btn">
-              <button class="button-main" @click="onBuy(ticketType)">立即预订</button>
+              <button
+                class="button-main"
+                @click="onBuy(ticketType)"
+                open-type="getUserInfo"
+                @getuserinfo="onGotUserInfo"
+                withCredentials="true"
+              >立即预订</button>
             </div>
           </div>
         </div>
@@ -168,6 +169,9 @@
             label=" "
             button-text="立即预订"
             @submit="onSelectBuy"
+            open-type="getUserInfo"
+            @getuserinfo="onGotUserInfo"
+            withCredentials="true"
           />
         </div>
       </van-popup>
@@ -183,8 +187,6 @@ import ticketTypeService from "@/services/ticketTypeService.js";
 import memberService from "@/services/memberService";
 import scenicService from "@/services/scenicService.js";
 import settingService from "@/services/settingService.js";
-import scenicImage1 from "@/assets/scenic1.jpg";
-import scenicImage2 from "@/assets/scenic2.jpg";
 import Swiper from "@/components/Swiper.vue";
 
 const today = dayjs();
@@ -202,14 +204,14 @@ export default {
   },
   data() {
     return {
-      images: [scenicImage1, scenicImage2],
+      images: [],
       scenic: {},
       showNotice: false,
       showScenic: false,
       ticketTypes: [],
       showDescription: false,
       selectedTicketType: {},
-      shareImgUrl: `${scenicImage1}`,
+      shareImgUrl: "",
       ticketTypeName: "",
       description: {
         bookDescription: "",
@@ -229,22 +231,22 @@ export default {
   },
   watch: {
     showDescription: function(val) {
-      if (val) {
-        wx.hideTabBar({});
-      } else {
-        wx.showTabBar({});
-      }
+      // if (val) {
+      //   wx.hideTabBar({});
+      // } else {
+      //   wx.showTabBar({});
+      // }
     }
   },
-  async onLoad() {
+  async onShow() {
     try {
       const loginTask = await memberService.loginFromMiniAsync();
       const member = memberService.getMember();
-      console.log(member);
-      // this.showGetUser = false;
+      if (member && member.openId) {
+        this.showGetUser = false;
+      }
       await this.loadData();
     } finally {
-
     }
   },
   methods: {
@@ -272,7 +274,7 @@ export default {
       const scenic = await scenicService.getScenicAsync();
       // .then(scenic => {
       if (scenic.photoList && scenic.photoList.length > 0) {
-        this.images = scenic.photoList.map(p => p.url);
+        this.images = scenic.photoList.map(p => p.url.replace("\\", "//"));
         this.shareImgUrl = this.images[0];
       }
 
@@ -314,16 +316,22 @@ export default {
       //   name: "buyticket",
       //   params: { ticketTypeId: ticketType.id }
       // });
-      wx.navigateTo({
-        url: `/pages/tickets/buy-ticket/main?ticketTypeId=${ticketType.id}`
-      });
+      const member = memberService.getMember();
+      if (member && member.openId) {
+        wx.navigateTo({
+          url: `/pages/tickets/buy-ticket/main?ticketTypeId=${ticketType.id}`
+        });
+      }
     },
     onSelectBuy() {
-      wx.navigateTo({
-        url: `/pages/tickets/buy-ticket/main?ticketTypeId=${
-          this.selectedTicketType.id
-        }`
-      });
+      const member = memberService.getMember();
+      if (member && member.openId) {
+        wx.navigateTo({
+          url: `/pages/tickets/buy-ticket/main?ticketTypeId=${
+            this.selectedTicketType.id
+          }`
+        });
+      }
     },
     getTravelDateText(ticketType) {
       const startTravelDate = dayjs(ticketType.startTravelDate);

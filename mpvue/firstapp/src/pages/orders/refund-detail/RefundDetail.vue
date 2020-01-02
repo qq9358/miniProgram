@@ -1,11 +1,7 @@
 <template>
   <div>
     <div class="refund-top">{{ topText }}</div>
-    <div
-      v-for="(refundApply, index) in refundApplys"
-      :key="index"
-      class="refund-item"
-    >
+    <div v-for="(refundApply, index) in refundApplys" :key="index" class="refund-item">
       <div class="refund-head">
         <div class="refund-status">{{ refundApply.refundStatusName }}</div>
         <div class="refund-time">
@@ -24,9 +20,7 @@
       <div v-if="refundApply.isOpen" class="refund-step">
         <div class="refund-info">
           <div class="refund-info-label">退回账户</div>
-          <div class="refund-info-content">
-            {{ refundApply.refundRecvAccount }}
-          </div>
+          <div class="refund-info-content">{{ refundApply.refundRecvAccount }}</div>
         </div>
         <div class="refund-info">
           <div class="refund-info-label">退款单号</div>
@@ -47,9 +41,7 @@
               v-for="(detail, detailIndex) in statusDetail.details"
               :key="detailIndex"
               class="refund-step-label"
-            >
-              {{ detail }}
-            </p>
+            >{{ detail }}</p>
           </van-step>
         </van-steps>
       </div>
@@ -66,7 +58,7 @@ export default {
     return {
       topText: "",
       refundApplys: [],
-      listNo: ''
+      listNo: ""
     };
   },
   async onLoad(option) {

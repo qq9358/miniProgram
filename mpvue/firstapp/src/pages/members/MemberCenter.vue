@@ -6,9 +6,7 @@
       </div>
       <div span="16">
         <div class="poster-name margin-bottom-10">{{ member.name }}</div>
-        <div class="poster-name" v-if="member.customerName">
-          {{ member.customerName }}
-        </div>
+        <div class="poster-name" v-if="member.customerName">{{ member.customerName }}</div>
       </div>
     </div>
 
@@ -44,14 +42,14 @@ export default {
       return memberService.getMember();
     }
   },
-  methods:{
-    myTicketClick(){
+  methods: {
+    myTicketClick() {
       // wx.navigateTo({
       //   url: '/pages/orders/my-ticket/main'
       // });
       wx.navigateTo({
-        url: '/pages/orders/my-ticket/main'
-      })
+        url: "/pages/orders/my-ticket/main"
+      });
     }
   }
 };
@@ -62,8 +60,8 @@ export default {
   height: 100px;
   color: white;
   background-color: #19a0f0;
-  display:flex;
-  align-items:center;
+  display: flex;
+  align-items: center;
 
   &-headimg {
     height: 60px;

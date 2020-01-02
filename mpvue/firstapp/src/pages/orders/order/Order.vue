@@ -96,8 +96,9 @@ export default {
       }
     });
   },
-  onLoad() {
-    this.getOrders();
+  async onShow() {
+    await this.getOrders();
+    await this.refreshOrder();
   },
   methods: {
     async tabClick({ mp }) {

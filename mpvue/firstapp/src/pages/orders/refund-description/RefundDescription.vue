@@ -34,7 +34,7 @@ export default {
       hasLoaded: false
     };
   },
-  async onLoad() {
+  async onShow() {
     await this.loadDescription();
   },
   methods: {
@@ -45,7 +45,7 @@ export default {
       this.ticketType = description;
       this.hasLoaded = true;
     },
-    onClose(){
+    onClose() {
       this.$emit("click");
     }
   }

@@ -21,9 +21,11 @@
         <img :src="successImage" />
         <van-row class="row">
           <van-col span="8" class="label">票类：</van-col>
-          <van-col span="16" class="value">{{
+          <van-col span="16" class="value">
+            {{
             checkResult.ticketTypeName
-          }}</van-col>
+            }}
+          </van-col>
         </van-row>
         <van-row class="row">
           <van-col span="8" class="label">票号：</van-col>
@@ -31,15 +33,19 @@
         </van-row>
         <van-row class="row">
           <van-col span="8" class="label">剩余数量：</van-col>
-          <van-col span="16" class="value">{{
+          <van-col span="16" class="value">
+            {{
             `${checkResult.surplusNum}/${checkResult.totalNum}`
-          }}</van-col>
+            }}
+          </van-col>
         </van-row>
         <van-row v-if="checkResult.lastCheckInTime" class="row">
           <van-col span="8" class="label">上次检票：</van-col>
-          <van-col span="16" class="value">{{
+          <van-col span="16" class="value">
+            {{
             checkResult.lastCheckInTime
-          }}</van-col>
+            }}
+          </van-col>
         </van-row>
         <h1>检票成功</h1>
       </section>
@@ -52,16 +58,8 @@
         <h1>{{ errorMsg }}</h1>
       </section>
       <img v-if="isValidTicket === ''" :src="checkImage" />
-      <van-button
-        type="primary"
-        size="large"
-        :loading="isLoading"
-        @click="onScan"
-        >扫码检票</van-button
-      >
-      <van-button type="default" size="large" class="search" @click="onSearch"
-        >门票查询</van-button
-      >
+      <van-button type="primary" size="large" :loading="isLoading" @click="onScan">扫码检票</van-button>
+      <van-button type="default" size="large" class="search" @click="onSearch">门票查询</van-button>
     </div>
   </div>
 </template>

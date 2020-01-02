@@ -20,9 +20,9 @@
     <div class="in-button">
       <button class="button-operate" size="large" :loading="saving" @click="pay">确认支付</button>
     </div>
+    <van-loading />
     <van-popup :show="showQuery" :close-on-click-overlay="false">
       <div class="popup-query">
-        <van-loading />
         <div class="popup-text">查询支付结果中...</div>
       </div>
     </van-popup>
@@ -93,32 +93,8 @@ export default {
       }
     }, 1000);
   },
-  beforeRouteLeave(to, from, next) {
-    if (!this.shouldConfirm || to.meta.shouldNotConfirm) {
-      this.clear();
-      next();
-      return;
-    }
-
-    this.$dialog
-      .confirm({
-        title: "你的支付尚未完成，是否取消支付？",
-        showCancelButton: true,
-        confirmButtonText: "继续支付",
-        cancelButtonText: "取消支付"
-      })
-      .then(() => {
-        next(false);
-      })
-      .catch(() => {
-        this.clear();
-        this.shouldConfirm = false;
-        next({
-          name: "orderdetail",
-          params: { listNo: this.listNo },
-          replace: true
-        });
-      });
+  onUnload(to, from, next) {
+    this.clear();
   },
   methods: {
     async pay() {
@@ -245,6 +221,8 @@ export default {
   color: #ffffff;
   padding: 30px 18px;
   text-align: center;
+  overflow: hidden;
+  border: 0px;
 }
 .popup-text {
   margin-top: 13px;

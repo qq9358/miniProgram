@@ -246,7 +246,7 @@
             size="small"
             plain
             @click="enrollFace"
-          >登记人脸</van-button> -->
+          >登记人脸</van-button>-->
         </section>
         <mptoast />
       </div>
