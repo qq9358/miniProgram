@@ -4,15 +4,6 @@
       <div class="scenic-screen">
         <Swiper :images="images" />
       </div>
-
-      <div v-if="showGetUser" class="parent_view" style="margin-top:rpx;">
-        <button
-          type="primary"
-          open-type="getUserInfo"
-          @getuserinfo="onGotUserInfo"
-          withCredentials="true"
-        >授权用户信息</button>
-      </div>
       <div v-if="scenic.noticeTitle" @click="showNotice = true" class="scenic-event">
         <div>
           <van-icon name="gonggao" />
@@ -69,9 +60,9 @@
             <div class="ticket-li-btn">
               <button
                 class="button-main"
-                @click="onBuy(ticketType)"
                 open-type="getUserInfo"
-                @getuserinfo="onGotUserInfo"
+                @click="onBuy(ticketType)"
+                @getuserinfo="onGotUserInfo($event,ticketType)"
                 withCredentials="true"
               >立即预订</button>
             </div>
@@ -164,15 +155,15 @@
               <div style="height:49px;">&nbsp;</div>
             </div>
           </div>
-          <van-submit-bar
-            :price="ticketTypePrice"
-            label=" "
-            button-text="立即预订"
-            @submit="onSelectBuy"
-            open-type="getUserInfo"
-            @getuserinfo="onGotUserInfo"
-            withCredentials="true"
-          />
+          <div class="div-submit-bar">
+            <button
+              class="button-submit-bar"
+              open-type="getUserInfo"
+              @click="onSelectBuy(ticketType)"
+              @getuserinfo="onGotUserInfo($event,ticketType)"
+              withCredentials="true"
+            >立即预订</button>
+          </div>
         </div>
       </van-popup>
     </div>
@@ -238,16 +229,13 @@ export default {
       // }
     }
   },
-  async onShow() {
-    try {
-      const loginTask = await memberService.loginFromMiniAsync();
-      const member = memberService.getMember();
-      if (member && member.openId) {
-        this.showGetUser = false;
-      }
-      await this.loadData();
-    } finally {
+  async onLoad() {
+    const loginTask = await memberService.loginFromMiniAsync();
+    const member = memberService.getMember();
+    if (member && member.openId) {
+      this.showGetUser = false;
     }
+    await this.loadData();
   },
   methods: {
     async loadData() {
@@ -312,10 +300,6 @@ export default {
       this.showDescription = true;
     },
     onBuy(ticketType) {
-      // this.$router.push({
-      //   name: "buyticket",
-      //   params: { ticketTypeId: ticketType.id }
-      // });
       const member = memberService.getMember();
       if (member && member.openId) {
         wx.navigateTo({
@@ -359,9 +343,22 @@ export default {
       }
       return ticketType.refundLimited ? "#ffae13" : "#099fde";
     },
-    onGotUserInfo: async function(e) {
-      await memberService.loginFromMiniAsync(e.mp.detail.userInfo);
-      await this.loadData();
+    onGotUserInfo: async function(e, ticketType) {
+      const member = memberService.getMember();
+      if (!member || !member.openId) {
+        if (e.mp.detail.errMsg == "getUserInfo:ok") {
+          await memberService.loginFromMiniAsync(e.mp.detail.userInfo);
+          let ticketTypeId = "";
+          if (ticketType && ticketType.id) {
+            ticketTypeId = ticketType.id;
+          } else {
+            ticketTypeId = this.selectedTicketType.id;
+          }
+          wx.navigateTo({
+            url: `/pages/tickets/buy-ticket/main?ticketTypeId=${ticketTypeId}`
+          });
+        }
+      }
     },
     ...mapMutations(["setGroundId"])
   }
@@ -610,6 +607,19 @@ export default {
         max-width: 100% !important;
       }
     }
+  }
+  .div-submit-bar {
+    display: flex;
+    background-color: #efefef;
+    flex-direction: row-reverse;
+  }
+  .button-submit-bar {
+    background-color: #ff7d13;
+    color: #ffffff;
+    border-radius: 0rpx;
+    font-size: 16px;
+    width: 40%;
+    line-height: 50px;
   }
 }
 </style>

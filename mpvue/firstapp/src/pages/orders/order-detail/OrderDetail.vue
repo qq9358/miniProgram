@@ -608,6 +608,8 @@ export default {
     margin: 0 6px 10px;
 
     &-action {
+      display: flex;
+      align-items: center;
       span {
         display: inline-block;
         vertical-align: middle;

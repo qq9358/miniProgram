@@ -116,7 +116,6 @@ export default {
             commonService.logError(res.errMsg);
           },
           complete: function(res) {
-            console.log(res);
           }
         });
         this.queryTimer = setInterval(() => {

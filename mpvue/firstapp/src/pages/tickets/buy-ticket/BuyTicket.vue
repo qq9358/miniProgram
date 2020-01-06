@@ -60,17 +60,27 @@
         <span class="booking-mod-hd-title">场次信息</span>
       </div>
       <div class="booking-mod-bd">
-        <div v-for="groundChangCi in ticketType.groundChangCis" :key="groundChangCi.groundId">
-          <div>{{groundChangCi.groundName}}</div>
-          <picker
-            :value="groundChangCi.changCiId"
-            :range="groundChangCi.changCis"
-            range-key="displayText"
-            @change="bindPickerChange($event,groundChangCi)"
-          >
-            <div v-if="groundChangCi.changCiId" class="picker">{{groundChangCi.changCiId}}</div>
-            <div v-else>请选择场次</div>
-          </picker>
+        <div
+          v-for="(groundChangCi,index) in ticketType.groundChangCis"
+          :key="index"
+          class="div-picker"
+        >
+          <div class="picker-title">{{groundChangCi.groundName}}</div>
+          <div class="picker-div">
+            <picker
+              mode="selector"
+              @change="bindPickerChange($event, groundChangCi, index)"
+              :range="groundChangCi.changCis"
+              :range-key="'displayText'"
+            >
+              <div
+                v-if="groundChangCis[index].selectName"
+                class="picker-select"
+              >{{groundChangCis[index].selectName}}</div>
+              <div v-else class="picker-select-empty">请选择场次</div>
+            </picker>
+            <van-icon name="arrow" />
+          </div>
         </div>
       </div>
     </div>
@@ -315,7 +325,8 @@ export default {
         usageDescription: "",
         refundDescription: "",
         otherDescription: ""
-      }
+      },
+      groundChangCis: []
     };
   },
   computed: {
@@ -552,6 +563,7 @@ export default {
         return;
       }
 
+      this.groundChangCis = [];
       this.ticketType.groundChangCis.forEach(groundChangCi => {
         if (groundChangCi.changCis.length == 0) {
           groundChangCi.changCis.push({
@@ -561,7 +573,12 @@ export default {
           });
         } else if (groundChangCi.changCis.length == 1) {
           groundChangCi.changCiId = groundChangCi.changCis[0].value;
+          groundChangCi.changCiName = groundChangCi.changCis[0].displayText;
+          this.groundChangCis[0].selectName = groundChangCi.changCiName;
         }
+        this.groundChangCis.push({
+          selectName: ""
+        });
       });
     },
     validateTourist(tourist) {
@@ -637,8 +654,10 @@ export default {
     editMobileChange(val) {
       this.editTourist.certNo = val.mp.detail;
     },
-    bindPickerChange({ mp }, groundChangCi) {
-      groundChangCi.changCiId = groundChangCi.changCis[mp.detail.value].value;
+    bindPickerChange({ mp }, groundChangCi, index) {
+      groundChangCi.changCiId = mp.detail.value;
+      this.groundChangCis[index].selectName =
+        groundChangCi.changCis[mp.detail.value].displayText;
     },
     changCiClick(groundChangCi) {
       groundChangCi.showPicker = true;
@@ -783,16 +802,15 @@ export default {
         }
       }
 
-      &-num {
-        .van-stepper {
-          display: flex;
-        }
+      // &-num {
+      //   .van-stepper {
+      //     display: flex;
+      //   }
 
-        /deep/ .van-stepper__input {
-          margin: 0;
-          // height: 26px;
-        }
-      }
+      //   .van-stepper__input {
+      //     height: 22px;
+      //   }
+      // }
 
       &-tips {
         margin: 5px -15px 0 -15px;
@@ -899,7 +917,23 @@ export default {
 
   .div-picker {
     display: flex;
+    padding-top: 10px;
+    padding-left: 15px;
+    padding-right: 20px;
+    padding-bottom: 10px;
+  }
+  .picker-title {
+    width: 90px;
+  }
+  .picker-div {
+    display: flex;
+    flex: 1;
     justify-content: space-between;
+  }
+  .picker-select-empty {
+    color: #a9a9a9;
+    justify-content: space-between;
+    align-items: center;
   }
 }
 

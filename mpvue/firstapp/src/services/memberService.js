@@ -25,7 +25,7 @@ export default {
           } else {
             await wx.getUserInfo({
               async success(rest) {
-
+                console.log(rest);
                 let params = {
                   code: res.code,
                   userInfo: rest.userInfo
